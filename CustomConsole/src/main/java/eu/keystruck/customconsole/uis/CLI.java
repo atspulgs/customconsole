@@ -24,7 +24,7 @@ public class CLI extends UserInterface {
         this.in = new Scanner(in);
         this.out = out;
         
-        this.listener.registerCommand(new Command("exit","This is a command registered by the CLI object!\nThe purpose of this command is to stop the execution of the Thread and ultimetally kill the UI itself.\nDepending on the implementation of the parent process, it could exit the program too.") {
+        this.listener.registerCommand(new Command("exit","This is a command registered by the CLI object!\n\tThe purpose of this command is to stop the execution of the Thread and ultimetally kill the UI itself.\n\tDepending on the implementation of the parent process, it could exit the program too.") {
             public void execute(UserInterface io, String... args) {
                 if(io == null)
                     throw new NullPointerException(
