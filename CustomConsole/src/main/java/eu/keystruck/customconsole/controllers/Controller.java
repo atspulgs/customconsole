@@ -18,6 +18,7 @@ public class Controller implements InputListener {
         var arguments = data.replace(cmdString, "").split(ARG_SPLITTER.pattern());
         if(this.cmdMap.containsKey(cmdString))
             this.cmdMap.get(cmdString).execute(source, arguments);
+        else source.push("Command not recognized.");
     }
 
     @Override
