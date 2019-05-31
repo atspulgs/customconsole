@@ -16,19 +16,21 @@ public class Controller implements InputListener {
         data = data.trim();
         var cmdString = data.substring(0, data.contains(" ")? data.indexOf(" ") : data.length());
         var arguments = data.replace(cmdString, "").split(ARG_SPLITTER.pattern());
-        if(this.cmdMap.containsKey(cmdString))
-            this.cmdMap.get(cmdString).execute(source, arguments);
+        var c = this.cmdMap.get(cmdString);
+        if(c != null)
+            c.execute(source, arguments);
         else source.push("Command not recognized.");
     }
 
     @Override
-    public void registerCommand(Command cmd) {
+    public synchronized void registerCommand(Command cmd) {
         if(cmd == null || this.cmdMap.containsKey(cmd.getCommand()))
             return;
         this.cmdMap.put(cmd.getCommand(), cmd);
     }
     
-    public void unregisterCommand(String cmd) {
+    @Override
+    public synchronized void unregisterCommand(String cmd) {
         if(cmd == null || cmd.isEmpty() || cmd.isBlank())
             return;
         if(this.cmdMap.containsKey(cmd))
