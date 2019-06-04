@@ -12,6 +12,7 @@ public final class Controller implements InputListener {
     
     public Controller() {
         this.registerCommand(new ListCommand(this.cmdMap));
+        this.registerCommand(new ManCommand(this.cmdMap));
     }
 
     @Override
@@ -19,8 +20,9 @@ public final class Controller implements InputListener {
         if(source == null || data == null || data.trim().isEmpty() || data.trim().isBlank())
             return;
         data = data.trim();
+        //"man man" didnt work and I dont know why.
         var cmdString = data.substring(0, data.contains(" ")? data.indexOf(" ") : data.length());
-        var arguments = data.replace(cmdString, "").split(ARG_SPLITTER.pattern());
+        var arguments = data.replace(cmdString, "").trim().split(ARG_SPLITTER.pattern());
         var c = this.cmdMap.get(cmdString);
         if(c != null)
             c.execute(source, arguments);
