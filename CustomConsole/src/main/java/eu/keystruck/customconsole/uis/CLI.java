@@ -41,14 +41,14 @@ public class CLI extends UserInterface {
     }
     
     @Override
-    public String fetch(String data) {
+    public synchronized String fetch(String data) {
         this.out.println(String.valueOf(data));
         this.out.print("- > ");
         return this.in.nextLine();
     }
 
     @Override
-    public void push(String data) {
+    public synchronized void push(String data) {
         this.out.println(String.valueOf(data));
     }
 

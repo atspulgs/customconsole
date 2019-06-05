@@ -2,7 +2,6 @@ package eu.keystruck.customconsole.controllers;
 
 import eu.keystruck.customconsole.commands.Command;
 import eu.keystruck.customconsole.uis.UserInterface;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class ManCommand extends Command {

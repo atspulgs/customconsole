@@ -1,5 +1,6 @@
-package eu.keystruck.customconsole.commands;
+package eu.keystruck.customconsole.controllers;
 
+import eu.keystruck.customconsole.commands.Command;
 import eu.keystruck.customconsole.uis.UserInterface;
 import java.util.HashMap;
 

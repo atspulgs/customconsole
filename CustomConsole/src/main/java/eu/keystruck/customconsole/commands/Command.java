@@ -18,7 +18,7 @@ public abstract class Command {
         this.description = description;
     }
     
-    public abstract void execute(UserInterface io, String... args);
+    public abstract void execute(final UserInterface io, final String... args);
     public String getCommand() { return this.command; }
     public String getDescription() { return this.description; }
 }
