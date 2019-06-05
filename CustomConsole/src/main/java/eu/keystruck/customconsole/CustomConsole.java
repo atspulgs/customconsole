@@ -1,3 +1,4 @@
+package eu.keystruck.customconsole;
 
 import eu.keystruck.customconsole.controllers.Controller;
 import eu.keystruck.customconsole.uis.CLI;
