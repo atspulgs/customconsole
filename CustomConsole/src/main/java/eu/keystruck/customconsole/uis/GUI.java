@@ -2,6 +2,7 @@ package eu.keystruck.customconsole.uis;
 
 import eu.keystruck.customconsole.commands.Command;
 import eu.keystruck.customconsole.controllers.InputListener;
+import eu.keystruck.customconsole.interpriter.RuleSet;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -93,6 +94,21 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
         this.wrapper.add(bottomWrap, BorderLayout.SOUTH);
         this.frame.setContentPane(this.wrapper);
         this.frame.setLocationRelativeTo(null);
+    }
+    /*
+     * This one is a mapper essentially, not sure how the defaults are gonna work.
+     */
+    private static AttributeSet genASFromRS(RuleSet rs) {
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet temp = SimpleAttributeSet.EMPTY;
+        var ruleList = rs.getRuleList();
+        temp = sc.addAttribute(temp, StyleConstants.Foreground, ruleList.get(RuleSet.Rule.COLOR));
+        temp = sc.addAttribute(temp, StyleConstants.Background, ruleList.get(RuleSet.Rule.BG));
+        temp = sc.addAttribute(temp, StyleConstants.FontFamily, ruleList.get(RuleSet.Rule.FONT));
+        temp = sc.addAttribute(temp, StyleConstants.FontSize, ruleList.get(RuleSet.Rule.SIZE));
+        temp = sc.addAttribute(temp, StyleConstants.Bold, ruleList.get(RuleSet.Rule.WEIGHT));
+        temp = sc.addAttribute(temp, StyleConstants.Italic, ruleList.get(RuleSet.Rule.ITALIC));
+        return temp;
     }
     
     private static AttributeSet genAS(Color c) {
