@@ -16,6 +16,15 @@ public class RuleSet {
             this.name = name;
         }
         public String getName() { return this.name; }
+        public static Rule getRule(String name) {
+            if(name == null)
+                return null;
+            for(Rule e : Rule.values()) {
+                if(e.getName().equals(name))
+                    return e;
+            }
+            return null;
+        }
     }  
     private static final HashMap<Rule,String[]> defRules = new HashMap();
     static {

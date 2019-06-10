@@ -27,11 +27,12 @@ public class CustomConsole {
         System.out.println(TextAttribute.WEIGHT_ULTRABOLD);     //2.75
         System.out.println(TextAttribute.POSTURE_REGULAR);      //0.0
         System.out.println(TextAttribute.POSTURE_OBLIQUE);      //0.2*/
-        /*Tokenizer tk = new Tokenizer();
-        tk.tokenize("Hello<<c:100,200,250>>World<<c:100,200,250>>World<<c:100,200,250>>World<</c>><</c>><<upper>><</c>>, This<</b>> <</b>>is me!<<c:100,200,250>>World<</c>>");
+        Tokenizer tk = new Tokenizer();
+        tk.tokenize("<<color:255,255,255>>White Text<</color>> Unformatted Text <<weight:2.0>> Bold text <<color:255,0,0>> and this is bold red text<</color>><</weight>>");
         System.out.println(Arrays.toString(tk.getTokens().toArray()));
         Parser p = new Parser();
         p.parse(tk.getTokens());
-        System.out.println(p.getRoot());*/
+        p.construct().forEach((entry) -> System.out.println(entry.toString()));
+        //System.out.println(p.getRoot());
     }
 }

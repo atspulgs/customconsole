@@ -37,9 +37,9 @@ public class Tokenizer {
     private final LinkedList<Token> tokens = new LinkedList();
     
     public Tokenizer() {
-        this.tokenModlds.add(new TokenMold("<<[a-zA-Z0-9:,_ -]+?>>", 2)); //Tag OPEN
+        this.tokenModlds.add(new TokenMold("<<[a-zA-Z0-9:,_. -]+?>>", 2)); //Tag OPEN
         this.tokenModlds.add(new TokenMold("<<[/a-zA-Z_ -]+?>>", 3)); //Tag CLOSE
-        this.tokenModlds.add(new TokenMold(".+?(?=(<<[a-zA-Z0-9:,_/ -]+?>>)|$)", 1)); //Text (quite important that tags are matched first.)
+        this.tokenModlds.add(new TokenMold(".+?(?=(<<[a-zA-Z0-9:,_/. -]+?>>)|$)", 1)); //Text (quite important that tags are matched first.)
     }
     
     public void tokenize(final String data) {

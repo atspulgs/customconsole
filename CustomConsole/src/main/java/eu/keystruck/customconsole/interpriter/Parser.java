@@ -46,9 +46,11 @@ public class Parser {
     public static class TagNode extends Node {
         public final String name;
         public final String[] args;
-        public TagNode(Node parent, String name, String... args) {
+        public final RuleSet rules;
+        public TagNode(Node parent, String name, RuleSet rules, String... args) {
             super(false, parent);
             this.name = name;
+            this.rules = rules;
             this.args = args;
         }
         
@@ -93,7 +95,7 @@ public class Parser {
         }
     }
     
-    private static final Pattern TAG_OPEN_PATTERN = Pattern.compile("<<(?<name>[a-zA-Z0-9_-]+?)(:(?<args>[a-zA-Z0-9,_-]*))?>>");
+    private static final Pattern TAG_OPEN_PATTERN = Pattern.compile("<<(?<name>[a-zA-Z0-9_-]+?)(:(?<args>[a-zA-Z0-9,_.-]*))?>>");
     private static final Pattern TAG_CLOSE_PATTERN = Pattern.compile("<</(?<name>[a-zA-Z0-9_-]+?)>>");
     
     private LinkedList<Token> stack = null;
@@ -128,7 +130,15 @@ public class Parser {
                 var om = TAG_OPEN_PATTERN.matcher(this.pointer.token);
                 if(om.matches()) {
                     System.out.println("\tName: "+om.group("name") +"\n\tArgs: "+String.valueOf(om.group("args")));
-                    var on = new TagNode(this.current, om.group("name"), om.group("args") == null?null: om.group("args").split(","));
+                    var r = RuleSet.Rule.getRule(om.group("name"));
+                    var ruleSet = new RuleSet();
+                    if(this.current instanceof TagNode) {
+                        ruleSet = ((TagNode)this.current).rules;
+                    }
+                    if(om.group("name") != null && r != null ) {
+                        ruleSet.setRule(r, om.group("args") == null?null: om.group("args").split(","));
+                    }
+                    var on = new TagNode(this.current, om.group("name"), ruleSet, om.group("args") == null?null: om.group("args").split(","));
                     this.current.addChild(on);
                     this.current = on;
                 }
@@ -159,5 +169,26 @@ public class Parser {
     
     public Node getRoot() {
         return this.root;
+    }
+    
+    private final LinkedList<FormattedText> list = new LinkedList();
+    public LinkedList<FormattedText> construct() {
+        this.list.clear();
+        trav(this.root);
+        return new LinkedList<>(this.list);
+    }
+    
+    private void trav(Node n) {
+        if(n == null || n.children == null) return;
+        LinkedList<Node> childCopy = n.children;
+        childCopy.forEach((node) -> {
+            if(node.leaf) {
+                TextNode tn = (TextNode) node;
+                RuleSet rs = tn.parent.isRoot()? new RuleSet(): ((TagNode) tn.parent).rules;
+                list.add(new FormattedText(tn.text, rs));
+            } else {
+                trav(node);
+            }
+        });
     }
 }
