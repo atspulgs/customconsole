@@ -10,10 +10,10 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomConsole {
+public final class CustomConsole {
     public static void main(String... args) {
         //(new Thread(new CLI(new Controller(), System.in, System.out))).start();
-        (new  Thread(new GUI(new Controller()))).start();
+        (new Thread(new GUI(new Controller()))).start();
         /*System.out.println(TextAttribute.WEIGHT_EXTRA_LIGHT);   //0.5
         System.out.println(TextAttribute.WEIGHT_LIGHT);         //0.75
         System.out.println(TextAttribute.WEIGHT_DEMILIGHT);     //0.875
@@ -34,5 +34,16 @@ public class CustomConsole {
         p.parse(tk.getTokens());
         p.construct().forEach((entry) -> System.out.println(entry.toString()));*/
         //System.out.println(p.getRoot());
+    }
+    
+    private CustomConsole(){}
+    
+    public static Thread getUIInstance(final Controller crtl) {
+        if(crtl == null) return null;
+        return new Thread(new GUI(crtl));
+    }
+    
+    public static Controller getCRTLInstance() {
+        return new Controller();
     }
 }
