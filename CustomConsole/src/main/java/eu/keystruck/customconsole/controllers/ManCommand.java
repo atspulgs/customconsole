@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class ManCommand extends Command {
     private static final String COMMAND = "man";
     private static final String DESCRIPTION = "Shows the help page fo the target command."
-            + "\n\tSyntax: man <target>";
+            + "\n\tSyntax: <<color:255,120,120>><<weight:2.0>>man <target><</weight>><</color>>";
     private HashMap<String,Command> traversable = null;
     
     public ManCommand(HashMap<String,Command> traversable) {
@@ -29,16 +29,16 @@ public class ManCommand extends Command {
             return;
         }
         if(args == null || args.length <= 0 || args[0].isEmpty() || args[0].isBlank()) {
-            io.push("No arguments provided, this command requires a target!");
-            io.push(this.getDescription());
+            io.push("<<color:255,100,100>><<font:Lucida Console>><<italic:0.2>><<weight:2.0>>No arguments provided, this command requires a target!<</color>>");
+            io.push("<<color:120,120,255>>"+this.getDescription()+"<</color>>");
             return;
         }
         var command = this.traversable.get(args[0]);
         if(command != null) {
-            io.push(command.getDescription());
+            io.push("<<color:120,120,255>>"+command.getDescription()+"<</color>>");
         } else {
-            io.push("Could not find the provided target command in the registered pool!");
-            io.push(this.getDescription());
+            io.push("<<color:255,100,100>><<font:Lucida Console>><<italic:0.2>><<weight:2.0>>Could not find the provided target command in the registered pool!<</color>>");
+            io.push("<<color:120,120,255>>"+this.getDescription()+"<</color>>");
         }
     }
 }

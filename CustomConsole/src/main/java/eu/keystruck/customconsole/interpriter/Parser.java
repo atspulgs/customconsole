@@ -95,8 +95,8 @@ public class Parser {
         }
     }
     
-    private static final Pattern TAG_OPEN_PATTERN = Pattern.compile("<<(?<name>[a-zA-Z0-9_-]+?)(:(?<args>[a-zA-Z0-9,_.-]*))?>>");
-    private static final Pattern TAG_CLOSE_PATTERN = Pattern.compile("<</(?<name>[a-zA-Z0-9_-]+?)>>");
+    private static final Pattern TAG_OPEN_PATTERN = Pattern.compile("<<(?<name>[a-zA-Z0-9_-]+?)(:(?<args>[a-zA-Z0-9,_.-]*))?>>", Pattern.DOTALL);
+    private static final Pattern TAG_CLOSE_PATTERN = Pattern.compile("<</(?<name>[a-zA-Z0-9_-]+?)>>", Pattern.DOTALL);
     
     private LinkedList<Token> stack = null;
     private Token pointer = null;
@@ -119,7 +119,7 @@ public class Parser {
     }
 
     private void evaluate() {
-        System.out.println("Pointer: "+this.pointer);
+        //System.out.println("Pointer: "+this.pointer);
         if(this.pointer == null)
             return;
         switch (this.pointer.code) {
@@ -129,11 +129,11 @@ public class Parser {
             case Token.TAG_OPEN:
                 var om = TAG_OPEN_PATTERN.matcher(this.pointer.token);
                 if(om.matches()) {
-                    System.out.println("\tName: "+om.group("name") +"\n\tArgs: "+String.valueOf(om.group("args")));
+                    //System.out.println("\tName: "+om.group("name") +"\n\tArgs: "+String.valueOf(om.group("args")));
                     var r = RuleSet.Rule.getRule(om.group("name"));
                     var ruleSet = new RuleSet();
                     if(this.current instanceof TagNode) {
-                        ruleSet = ((TagNode)this.current).rules;
+                        ruleSet = new RuleSet(((TagNode)this.current).rules);
                     }
                     if(om.group("name") != null && r != null ) {
                         ruleSet.setRule(r, om.group("args") == null?null: om.group("args").split(","));
@@ -146,7 +146,7 @@ public class Parser {
             case Token.TAG_CLOSE:
                 var cm = TAG_CLOSE_PATTERN.matcher(this.pointer.token);
                 if(cm.matches()) {
-                    System.out.println("\tName: "+cm.group("name"));
+                    //System.out.println("\tName: "+cm.group("name"));
                     var safekeep = this.current;
                     var found = false;
                     

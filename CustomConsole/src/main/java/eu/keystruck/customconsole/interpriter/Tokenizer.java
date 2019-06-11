@@ -9,7 +9,7 @@ public class Tokenizer {
         public final int code;
         
         public TokenMold(final String regex, final int code) {
-            this.pattern = Pattern.compile("^("+regex+")");
+            this.pattern = Pattern.compile("^("+regex+")", Pattern.DOTALL);
             this.code = code;
         }
     }
@@ -45,13 +45,13 @@ public class Tokenizer {
     public void tokenize(final String data) {
         var string = new String(data);
         this.tokens.clear();
-        loop:while(!string.isBlank()) {
-            System.out.println(string);
+        loop:while(!string.isEmpty()) {
+            //System.out.println(string);
             for(var tm : this.tokenModlds) {
                 var matcher = tm.pattern.matcher(string);
                 if(matcher.find()) {
                     var t = matcher.group();
-                    System.out.println("Code: "+tm.code+" T: "+t);
+                    //System.out.println("Code: "+tm.code+" T: "+t);
                     this.tokens.add(new Token(t, tm.code));
                     string = matcher.replaceFirst("");
                     continue loop;

@@ -31,7 +31,7 @@ public class ListCommand extends Command {
             //Potentially other formats here.
             
             //default output
-            io.push(item.getCommand() + " - " + item.getDescription());
+            io.push("<<color:120,255,120>>"+item.getCommand()+"<</color>>");
         });
     }
     

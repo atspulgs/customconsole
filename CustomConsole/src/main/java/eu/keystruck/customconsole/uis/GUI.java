@@ -2,7 +2,9 @@ package eu.keystruck.customconsole.uis;
 
 import eu.keystruck.customconsole.commands.Command;
 import eu.keystruck.customconsole.controllers.InputListener;
+import eu.keystruck.customconsole.interpriter.Parser;
 import eu.keystruck.customconsole.interpriter.RuleSet;
+import eu.keystruck.customconsole.interpriter.Tokenizer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -101,13 +104,44 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
     private static AttributeSet genASFromRS(RuleSet rs) {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet temp = SimpleAttributeSet.EMPTY;
+        Color color = Color.LIGHT_GRAY;
+        Color bg;
+        String font = "Courier New";
+        int fontSize;
+        boolean weight;
+        boolean italic;
         var ruleList = rs.getRuleList();
-        temp = sc.addAttribute(temp, StyleConstants.Foreground, ruleList.get(RuleSet.Rule.COLOR));
-        temp = sc.addAttribute(temp, StyleConstants.Background, ruleList.get(RuleSet.Rule.BG));
-        temp = sc.addAttribute(temp, StyleConstants.FontFamily, ruleList.get(RuleSet.Rule.FONT));
-        temp = sc.addAttribute(temp, StyleConstants.FontSize, ruleList.get(RuleSet.Rule.SIZE));
-        temp = sc.addAttribute(temp, StyleConstants.Bold, ruleList.get(RuleSet.Rule.WEIGHT));
-        temp = sc.addAttribute(temp, StyleConstants.Italic, ruleList.get(RuleSet.Rule.ITALIC));
+        var colTemp = ruleList.get(RuleSet.Rule.COLOR);
+        if(colTemp != null && colTemp.length >= 3) {
+            color = new Color(Integer.parseInt(colTemp[0]),Integer.parseInt(colTemp[1]),Integer.parseInt(colTemp[2]));
+        }
+        temp = sc.addAttribute(temp, StyleConstants.Foreground, color);
+        colTemp = ruleList.get(RuleSet.Rule.BG);
+        if(colTemp != null && colTemp.length >= 3) {
+            bg = new Color(Integer.parseInt(colTemp[0]),Integer.parseInt(colTemp[1]),Integer.parseInt(colTemp[2]));
+            temp = sc.addAttribute(temp, StyleConstants.Background, bg);
+        }
+        colTemp = ruleList.get(RuleSet.Rule.FONT);
+        if(colTemp != null) {
+            font = String.valueOf(colTemp[0]);
+        }
+        temp = sc.addAttribute(temp, StyleConstants.FontFamily, font);
+        colTemp = ruleList.get(RuleSet.Rule.SIZE);
+        if(colTemp != null) {
+            fontSize = Integer.parseInt(colTemp[0]);
+            temp = sc.addAttribute(temp, StyleConstants.FontSize, fontSize);
+        }
+        colTemp = ruleList.get(RuleSet.Rule.WEIGHT);
+        if(colTemp != null) {
+            weight = Float.parseFloat(colTemp[0]) > 1.0;
+            temp = sc.addAttribute(temp, StyleConstants.Bold, weight);
+        }
+        colTemp = ruleList.get(RuleSet.Rule.ITALIC);
+        if(colTemp != null) {
+            italic = Float.parseFloat(colTemp[0]) > 0.0;
+            temp = sc.addAttribute(temp, StyleConstants.Italic, italic);
+        }
+        temp = sc.addAttribute(temp, StyleConstants.Alignment, StyleConstants.ALIGN_LEFT);
         return temp;
     }
     
@@ -157,7 +191,17 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
 
     @Override
     public synchronized void push(String data) {
-        this.addTextToOut(data+"\n", REGULAR);
+        Tokenizer tk = new Tokenizer();
+        Parser p = new Parser();
+        tk.tokenize(data);
+        //System.out.println(Arrays.toString(tk.getTokens().toArray()));
+        p.parse(tk.getTokens());
+        //System.out.println(p.getRoot());
+        p.construct().forEach((entry) ->  {
+            this.addTextToOut(entry.text, genASFromRS(entry.rules));
+            //System.out.println(entry.toString());
+                });
+        this.addTextToOut("\n", REGULAR);
     }
 
     @Override

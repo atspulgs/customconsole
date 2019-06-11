@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class CustomConsole {
     public static void main(String... args) {
         //(new Thread(new CLI(new Controller(), System.in, System.out))).start();
-        //(new  Thread(new GUI(new Controller()))).start();
+        (new  Thread(new GUI(new Controller()))).start();
         /*System.out.println(TextAttribute.WEIGHT_EXTRA_LIGHT);   //0.5
         System.out.println(TextAttribute.WEIGHT_LIGHT);         //0.75
         System.out.println(TextAttribute.WEIGHT_DEMILIGHT);     //0.875
@@ -27,12 +27,12 @@ public class CustomConsole {
         System.out.println(TextAttribute.WEIGHT_ULTRABOLD);     //2.75
         System.out.println(TextAttribute.POSTURE_REGULAR);      //0.0
         System.out.println(TextAttribute.POSTURE_OBLIQUE);      //0.2*/
-        Tokenizer tk = new Tokenizer();
+        /*Tokenizer tk = new Tokenizer();
         tk.tokenize("<<color:255,255,255>>White Text<</color>> Unformatted Text <<weight:2.0>> Bold text <<color:255,0,0>> and this is bold red text<</color>><</weight>>");
         System.out.println(Arrays.toString(tk.getTokens().toArray()));
         Parser p = new Parser();
         p.parse(tk.getTokens());
-        p.construct().forEach((entry) -> System.out.println(entry.toString()));
+        p.construct().forEach((entry) -> System.out.println(entry.toString()));*/
         //System.out.println(p.getRoot());
     }
 }

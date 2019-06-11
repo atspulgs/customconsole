@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class FormattedText {
     public final String text;
-    private final RuleSet rules;
+    public final RuleSet rules;
     public FormattedText(final String text, RuleSet rules) {
         this.text = text;
         this.rules = new RuleSet(rules);
