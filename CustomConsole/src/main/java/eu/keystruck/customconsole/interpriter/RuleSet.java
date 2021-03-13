@@ -6,7 +6,7 @@ public class RuleSet {
     public static enum Rule {
         COLOR("color"),//ForeGround
         BG("bg"),//BackGround
-        FONT("font"),//Font Famility
+        FONT("font"),//Font Family
         SIZE("size"),//Font Size
         WEIGHT("weight"),//Font Weight
         ITALIC("italic");//Posture

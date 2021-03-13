@@ -1,7 +1,9 @@
 package eu.keystruck.customconsole.uis;
 
 import eu.keystruck.customconsole.commands.Command;
+import eu.keystruck.customconsole.controllers.Controller;
 import eu.keystruck.customconsole.controllers.InputListener;
+import eu.keystruck.customconsole.controllers.WorkingDirectoryListener;
 import eu.keystruck.customconsole.interpriter.Parser;
 import eu.keystruck.customconsole.interpriter.RuleSet;
 import eu.keystruck.customconsole.interpriter.Tokenizer;
@@ -14,12 +16,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -30,19 +33,20 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-public class GUI extends UserInterface implements ActionListener, KeyListener {
+public class GUI extends UserInterface implements ActionListener, KeyListener, WorkingDirectoryListener {
     public static final AttributeSet LINE_NUMBER = GUI.genAS(Color.GRAY, "Lucida Console");
     public static final AttributeSet TIMESTAMP = GUI.genAS(new Color(255,100,100), "Lucida Console");
     public static final AttributeSet REGULAR = GUI.genAS(Color.LIGHT_GRAY);
     
-    private static final int MIN_FRAME_WIDTH = 800;
-    private static final int MIN_FRAME_HEIGHT = 600;
+    private static final int MIN_FRAME_WIDTH = 1000;
+    private static final int MIN_FRAME_HEIGHT = 800;
     private static final Dimension MIN_FRAME_DIMENSION = new Dimension(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT);
     
     private final JFrame frame;
     private final JPanel wrapper;
     private final JTextPane output;
     private final JScrollPane outputScroll;
+    private final JLabel currentDirLabel;
     private final JTextField input;
     private final JButton submit;
     
@@ -54,8 +58,8 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
     
     public GUI(InputListener il) {
         super(il);
-        this.listener.registerCommand(new Command("exit", "Exits the UI!") {
-            public void execute(UserInterface io, String... args) {
+        this.listener.registerCommand(new Command("exit", "Exit", "Exits the UI!", "", "") {
+            @Override public void execute(UserInterface io, String... args) {
                 if(io == null)
                     throw new NullPointerException(
                         this.getClass().getName() 
@@ -72,14 +76,17 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
         this.wrapper = new JPanel();
         this.output = new JTextPane();
         this.outputScroll = new JScrollPane(this.output);
+        this.currentDirLabel = new JLabel(((Controller)this.listener).getCd().toAbsolutePath().normalize().toString());
         this.input = new JTextField();
         this.submit = new JButton("Commit");
         uiSetup();
     }
     
     private void uiSetup() {
+        ((Controller)this.listener).addWorkingDirectoryListener(this);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setMinimumSize(MIN_FRAME_DIMENSION);
+        this.input.setFocusTraversalKeysEnabled(false);
         this.wrapper.setLayout(new BorderLayout());
         EmptyBorder border = new EmptyBorder(new Insets(5,5,5,5));
         this.output.setBorder(border);
@@ -89,9 +96,14 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
         this.frame.getRootPane().setDefaultButton(this.submit);
         this.submit.addActionListener(this);
         this.outputScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.outputScroll.setBorder(null);
         this.wrapper.add(this.outputScroll, BorderLayout.CENTER);
         JPanel bottomWrap = new JPanel();
         bottomWrap.setLayout(new BorderLayout());
+        this.currentDirLabel.setBackground(Color.DARK_GRAY);
+        this.currentDirLabel.setForeground(Color.LIGHT_GRAY);
+        this.currentDirLabel.setOpaque(true);
+        bottomWrap.add(this.currentDirLabel, BorderLayout.NORTH);
         bottomWrap.add(this.input, BorderLayout.CENTER);
         bottomWrap.add(this.submit, BorderLayout.EAST);
         this.wrapper.add(bottomWrap, BorderLayout.SOUTH);
@@ -171,8 +183,7 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
         this.frame.dispatchEvent(new WindowEvent(this.frame, WindowEvent.WINDOW_CLOSING));
     }
     
-    @Override
-    public synchronized String fetch(String data) {
+    @Override public synchronized String fetch(String data) {
         this.addTextToOut(data+" -> ", REGULAR);
         this.waiting = true;
         while(this.waiting) {
@@ -189,8 +200,7 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
         return r;
     }
 
-    @Override
-    public synchronized void push(String data) {
+    @Override public synchronized void push(String data) {
         Tokenizer tk = new Tokenizer();
         Parser p = new Parser();
         tk.tokenize(data);
@@ -204,13 +214,11 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
         this.addTextToOut("\n", REGULAR);
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
         this.frame.setVisible(true);
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    @Override public void actionPerformed(ActionEvent e) {
         if(e.getSource() == this.submit) {
             if(this.waiting) {
                 //I dont think this needs a synchronized context.
@@ -232,12 +240,9 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
             }
         }
     }
-    @Override
-    public void keyTyped(KeyEvent e) { }
-    @Override
-    public void keyPressed(KeyEvent e) { }
-    @Override
-    public void keyReleased(KeyEvent e) {
+    @Override public void keyTyped(KeyEvent e) { }
+    @Override public void keyPressed(KeyEvent e) { }
+    @Override public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
         /* -
          * This is cycling through hisotry when pressing up or down arrows
@@ -269,6 +274,12 @@ public class GUI extends UserInterface implements ActionListener, KeyListener {
                 this.input.setText(this.history.get(this.historyIndex));
             else if(this.historyIndex <= -1)
                 this.input.setText("");
+        } else if(key == 9) {
+            System.out.println("Tab Pressed");
         }
+    }
+
+    @Override public void updateWorkingDirectory(Path wd) {
+        this.currentDirLabel.setText(wd.toAbsolutePath().normalize().toString());
     }
 }

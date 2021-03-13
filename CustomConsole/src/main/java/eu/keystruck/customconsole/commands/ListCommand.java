@@ -1,16 +1,18 @@
-package eu.keystruck.customconsole.controllers;
+package eu.keystruck.customconsole.commands;
 
-import eu.keystruck.customconsole.commands.Command;
 import eu.keystruck.customconsole.uis.UserInterface;
 import java.util.HashMap;
 
 public class ListCommand extends Command {
+    private static final String NAME = "Commands";
     private static final String COMMAND = "commands";
     private static final String DESCRIPTION = "Lists all currently registered commands.";
+    private static final String SYNTAX = "";
+    private static final String NOTES = "";
     private HashMap<String,Command> traversable = null;
     
     public ListCommand(HashMap<String,Command> traversable) {
-        super(COMMAND,DESCRIPTION);
+        super(COMMAND,NAME,DESCRIPTION,SYNTAX,NOTES);
         if(traversable != null)
             this.traversable = traversable;
     }
@@ -31,7 +33,7 @@ public class ListCommand extends Command {
             //Potentially other formats here.
             
             //default output
-            io.push("<<color:120,255,120>>"+item.getCommand()+"<</color>>");
+            io.push("<<color:120,255,120>>"+item.command+"<</color>>");
         });
     }
     
